@@ -1,6 +1,7 @@
 package com.fci.Transaction;
 
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,14 +40,14 @@ public class TransactionWS {
 	}
 	
  	
-    @GET
+    @POST
     @Path("/pushTransaction")
     public Response pushTransaction(@QueryParam("trdate") String trDate_str, @QueryParam("trvalue") String trValue_str) {
     	
-    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     	
     	 Date trDate=null;
-    	 BigDecimal trValue=null; 
+    	 BigDecimal trValue=null;  
     	 int shiftAmount=0;
     	 long diffSeconds=0;
     	 int index=-1;
@@ -56,8 +57,8 @@ public class TransactionWS {
 			Date currentDate=new Date();
 			shiftAmount=(int)((currentDate.getTime() - lastSynchronizeTime.getTime())/1000);
 			
-						
-			TransactionService.shiftArray(allValidTrasactions, shiftAmount, new BigDecimal(0));
+				
+			TransactionService.shiftArrayToLowerIndex(allValidTrasactions, shiftAmount, new BigDecimal(0));
 			
 			Response.status(Response.Status.NOT_FOUND).build();
 			
@@ -71,59 +72,67 @@ public class TransactionWS {
 			
 			trValue=new BigDecimal(trValue_str);
 			
-			if(index < allValidTrasactions.length && index >-1)
+			if(trValue.intValue() > 1000000){
+				return Response.status(Response.Status.BAD_REQUEST).entity("Transaction value must be less then 1000000").build();
+			}
+				
+			
+			if(index < allValidTrasactions.length && index >-1){
 				allValidTrasactions[index]=trValue;
+				
+				return Response.status(Response.Status.OK).entity("Transaction is pushed succesfully").build();
+			}else{
+				
+				return Response.status(Response.Status.BAD_REQUEST).entity("Transaction Date must be not before 60 seconds and not after 1 hour").build();
+			}
 						
 			
 			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}catch (ParseException e) {
+			return Response.status(Response.Status.BAD_REQUEST).entity("Transaction Date must be formated as YYYY-MM-dd HH:mm:ss").build();
+		}catch (NumberFormatException e){
+			return Response.status(Response.Status.BAD_REQUEST).entity("Transaction value is in a bad formate").build();
 		}
+		catch (Exception e) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("General error").build();
+		}
+		
     	
-		return Response.ok().build();
+		
     	
     }
+    /*
+     * 
+     */
     
     @GET
     @Path("/transactionStatistics")
-    public String getBook() {
+    public String transactionStatistics() {
     	
-    	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-    	//String trdate_str="2019-4-6 05:40:00";
+    	
     	 Date trdate=null;
     	 BigDecimal trvalue=null; 
-    	 int shifAmount=-2;
-    	 long diffSeconds=-50;
-    	 int index=-33;
+    	 int shiftAmount=0;
+    	 long diffSeconds=0;
+    	 int index=-1;
     	 BigDecimal sum=new BigDecimal(0);
     	 
     	 String dates="";
 		try {
 			
 			Date currentDate=new Date();
-			shifAmount=(int)((currentDate.getTime() - lastSynchronizeTime.getTime())/1000);
 			
-			for(int i=shifAmount;i < allValidTrasactions.length;i++)
-				allValidTrasactions[i-shifAmount]=allValidTrasactions[i];
+			shiftAmount=(int)((currentDate.getTime() - lastSynchronizeTime.getTime())/1000);
 			
-			
-			int endshift=allValidTrasactions.length-shifAmount-1;
-			for(int i=allValidTrasactions.length-1;i>endshift;i--)
-				allValidTrasactions[i]=new BigDecimal(0);
+			TransactionService.shiftArrayToLowerIndex(this.allValidTrasactions, shiftAmount, new BigDecimal(0));
 			
 			
 			lastSynchronizeTime.setTime(currentDate.getTime());
 			
-			 sum=new BigDecimal(0);
 			
-			 
-			for(int i=0;i<60;i++){
-				if(allValidTrasactions[i].intValue()>0){
-					dates+="("+i+","+allValidTrasactions[i].intValue()+") , ";
-				}
-				sum=sum.add(allValidTrasactions[i]);
-			}
+			TransactionService.getElementStatistics(this.allValidTrasactions, 60);
+			
+			
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
