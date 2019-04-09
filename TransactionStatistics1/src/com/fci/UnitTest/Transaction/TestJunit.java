@@ -103,7 +103,7 @@ public class TestJunit extends TestCase {
 	 
 	 String transactionValue="30";
 	 
-	 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	 
 	 String transactionDate_str=formatter.format(transactionDate);
 	 
