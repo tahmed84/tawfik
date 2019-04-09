@@ -14,6 +14,7 @@ import java.util.Date;
 import javax.inject.Singleton;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
   
 
 @Path("/transaction")
@@ -40,29 +41,25 @@ public class TransactionWS {
  	
     @GET
     @Path("/pushTransaction")
-    public String pushTransaction(@QueryParam("trdate") String trDate_str, @QueryParam("trvalue") String trValue_str) {
+    public Response pushTransaction(@QueryParam("trdate") String trDate_str, @QueryParam("trvalue") String trValue_str) {
     	
     	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     	
     	 Date trDate=null;
     	 BigDecimal trValue=null; 
-    	 int shifAmount=-2;
-    	 long diffSeconds=-50;
-    	 int index=-33;
+    	 int shiftAmount=0;
+    	 long diffSeconds=0;
+    	 int index=-1;
     	 BigDecimal sum=new BigDecimal(0);
 		try {
 			
 			Date currentDate=new Date();
-			shifAmount=(int)((currentDate.getTime() - lastSynchronizeTime.getTime())/1000);
+			shiftAmount=(int)((currentDate.getTime() - lastSynchronizeTime.getTime())/1000);
 			
-			for(int i=shifAmount;i < allValidTrasactions.length;i++)
-				allValidTrasactions[i-shifAmount]=allValidTrasactions[i];
+						
+			TransactionService.shiftArray(allValidTrasactions, shiftAmount, new BigDecimal(0));
 			
-			
-			int endshift=allValidTrasactions.length-shifAmount-1;
-			for(int i=allValidTrasactions.length-1;i>endshift;i--)
-				allValidTrasactions[i]=new BigDecimal(0);
-			
+			Response.status(Response.Status.NOT_FOUND).build();
 			
 			trDate = formatter.parse(trDate_str);
 			
@@ -84,7 +81,7 @@ public class TransactionWS {
 			e.printStackTrace();
 		}
     	
-    	return trDate.toString()+"  "+trValue_str+"  "+index+"   "+sum;
+		return Response.ok().build();
     	
     }
     
