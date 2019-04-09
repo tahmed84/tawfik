@@ -21,7 +21,7 @@ import javax.ws.rs.core.MediaType;
 @Produces({ "application/json" })
 @Singleton
 public class TransactionWS {  
- // test commit
+ // test commit 222
 	private static BigDecimal[] allValidTrasactions=new BigDecimal[3661];
 	
 	private static Date lastSynchronizeTime=new Date();
