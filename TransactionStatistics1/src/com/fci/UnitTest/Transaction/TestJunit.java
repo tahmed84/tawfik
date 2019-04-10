@@ -177,5 +177,16 @@ public class TestJunit extends TestCase {
 		assertEquals(Response.Status.OK.getStatusCode(), statusCode);
 
 	}
+	
+	@Test
+	public void testGethTransactionWebService(){
+		
+		String str=WebServiceClient.testGetTransactionWS();
+		
+		System.out.println(str);
+		
+		assertEquals("{sum:60,count:3,avg:20,min:10,max:30}", str);
+		
+	}
 
 }

@@ -82,11 +82,22 @@ public class WebServiceClient {
 
 			URL url = new URL("http://127.0.0.1:8080/transactionWs/transaction/transactionStatistics");
 			conn = (HttpURLConnection) url.openConnection();
-			conn.setRequestMethod("POST");
+			conn.setRequestMethod("GET");
 			conn.setRequestProperty("Accept", "application/json");
-			InputStreamReader in = null;
+			 InputStreamReader in=null;
+	            
+	            if (conn.getResponseCode() == 200) {
+	            	in = new InputStreamReader(conn.getInputStream());
+	            }else{
+	            	
+	            	in = new InputStreamReader(conn.getErrorStream());
+	            	
+	            }
+	            
+	            BufferedReader br = new BufferedReader(in);
+	            String output=br.readLine();
 
-			return conn.getResponseMessage();
+			return output;
 
 		} catch (MalformedURLException e) {
 			return "generl error";
