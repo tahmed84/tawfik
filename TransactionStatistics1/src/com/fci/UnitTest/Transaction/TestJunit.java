@@ -13,6 +13,8 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.ws.rs.core.Response;
+
 
 public class TestJunit extends TestCase {
 	
@@ -73,7 +75,7 @@ public class TestJunit extends TestCase {
 	  
 	  BigDecimal tagetAvg=(new BigDecimal(49)).divide(new BigDecimal(8),2,BigDecimal.ROUND_HALF_UP);
 	  
-	  BigDecimal[] target= new BigDecimal[] {new BigDecimal(49),new BigDecimal(8),tagetAvg,new BigDecimal(15),new BigDecimal(-1)};
+	  BigDecimal[] target= new BigDecimal[] {new BigDecimal(49),new BigDecimal(8),tagetAvg,new BigDecimal(-1),new BigDecimal(15)};
 	  
 	  
 	  
@@ -85,7 +87,7 @@ public class TestJunit extends TestCase {
 	  
 	   tagetAvg=(new BigDecimal(10)).divide(new BigDecimal(3),2,BigDecimal.ROUND_HALF_UP);
 	  
-	 target= new BigDecimal[] {new BigDecimal(10),new BigDecimal(3),tagetAvg,new BigDecimal(8),new BigDecimal(-1)};
+	 target= new BigDecimal[] {new BigDecimal(10),new BigDecimal(3),tagetAvg,new BigDecimal(-1),new BigDecimal(8)};
 	  
 	 returnValues=TransactionService.getElementStatistics(elements, 4);
 	  
@@ -93,27 +95,89 @@ public class TestJunit extends TestCase {
   }
   
   @Test
-  public void testTransactionWebService(){
+  public void testPushTransactionWebService(){
 	 
 			 
-	Date currentDate=new Date();
-	
-	 // time before 20 seconds
-	 Date transactionDate=new Date(currentDate.getTime()+10*60*1000);
-	 
-	 String transactionValue="30";
-	 
-	 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	 
-	 String transactionDate_str=formatter.format(transactionDate);
-	 
-	 int statusCode= WebServiceClient.testTransactionWS(transactionDate_str, transactionValue);
-	 
-	 assertEquals(200, statusCode);
+	  Date currentDate=new Date();
+		
+		 // time before 20 seconds
+		 Date transactionDate=new Date(currentDate.getTime()-2*1000);
+		 
+		 String transactionValue="30";
+		 
+		 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		 
+		 String transactionDate_str=formatter.format(transactionDate);
+		 
+		 int statusCode= WebServiceClient.testTransactionWS(transactionDate_str, transactionValue);
+		 
+		 assertEquals(Response.Status.OK.getStatusCode(), statusCode);
+		 
+		 currentDate=new Date();
+			
+		 // time before 20 seconds
+		 transactionDate=new Date(currentDate.getTime()-5*1000);
+		 
+		 transactionValue="10";
+		 
+		 formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		 
+		 transactionDate_str=formatter.format(transactionDate);
+		 
+		 statusCode= WebServiceClient.testTransactionWS(transactionDate_str, transactionValue);
+		 
+		 assertEquals(Response.Status.OK.getStatusCode(), statusCode);
+		 
+		 currentDate=new Date();
+			
+		 // time before 20 seconds
+		 transactionDate=new Date(currentDate.getTime()+65*60*1000);
+		 
+		 transactionValue="50";
+		 
+		 formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		 
+		 transactionDate_str=formatter.format(transactionDate);
+		 
+		 statusCode= WebServiceClient.testTransactionWS(transactionDate_str, transactionValue);
+		 
+		 assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), statusCode);
+		 
+		 
+		 transactionDate=new Date(currentDate.getTime()-120*1000);
+		 
+		 transactionValue="50";
+		 
+		 formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		 
+		 transactionDate_str=formatter.format(transactionDate);
+		 
+		 statusCode= WebServiceClient.testTransactionWS(transactionDate_str, transactionValue);
+		 
+		 assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), statusCode);
+		 
+		 
+		 transactionDate=new Date(currentDate.getTime()-15*1000);
+		 
+		 transactionValue="20";
+		 
+		 formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		 
+		 transactionDate_str=formatter.format(transactionDate);
+		 
+		 statusCode= WebServiceClient.testTransactionWS(transactionDate_str, transactionValue);
+		 
+		 assertEquals(Response.Status.OK.getStatusCode(), statusCode);
+		 
+		 
+
 	 
 	 
 	 
   }
+  
+  
+ 
   
      
 }
