@@ -14,6 +14,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
+
+import sun.org.mozilla.javascript.internal.GeneratedClassLoader;
+
 @Path("/transaction")
 @Consumes({ "application/json" })
 @Produces({ "application/json" })
@@ -23,6 +27,8 @@ public class TransactionWS {
 	private static BigDecimal[] allValidTrasactions = new BigDecimal[3661];
 
 	private static Date lastSynchronizeTime = new Date();
+	
+	private static Logger log=Logger.getLogger(TransactionWS.class);
 
 	static {
 
@@ -79,18 +85,27 @@ public class TransactionWS {
 
 					return Response.status(Response.Status.OK).entity("Transaction is pushed succesfully").build();
 				} else {
+					
+					
 
 					return Response.status(Response.Status.BAD_REQUEST)
 							.entity("Transaction Date must be not before 60 seconds and not after 1 hour").build();
 				}
 
 			} catch (ParseException e) {
+				
+				log.error(e.getMessage()+  "\nTransaction Date must be formated as YYYY-MM-dd HH:mm:ss");
 				return Response.status(Response.Status.BAD_REQUEST)
 						.entity("Transaction Date must be formated as YYYY-MM-dd HH:mm:ss").build();
 			} catch (NumberFormatException e) {
+				
+				log.error(e.getMessage()+ "\nTransaction value is in a bad formate");
+				
 				return Response.status(Response.Status.BAD_REQUEST).entity("Transaction value is in a bad formate")
 						.build();
 			} catch (Exception e) {
+				log.error(e.getMessage()+ "\nGeneral error");
+				
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("General error").build();
 			}
 
@@ -130,6 +145,7 @@ public class TransactionWS {
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			log.error(e.getMessage()+"\nGeneral error");
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("General error").build();
 		}
 

@@ -14,7 +14,7 @@ public class WebServiceClient {
 		try {
 
 			URL url = new URL(
-					"http://127.0.0.1:8080/transactionWs/transaction/pushTransaction?trdate=2019-04-08%2011:30:00&trvalue=xyz");// your
+					"http://127.0.0.1:8080/transactionWs/transaction/pushTransaction?trdate=xxxxxxxxx&trvalue=xyz");// your
 																																// url
 																																// i.e
 																																// fetch
